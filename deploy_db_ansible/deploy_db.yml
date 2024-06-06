@@ -1,0 +1,33 @@
+---
+- name: "Activiti ec2 hosted db Deployment Ansible Playbook"
+  hosts: localhost
+  connection: local
+  become: False
+  vars:
+    security_group: sg-06dcd234428d3e028
+  tasks:
+  - name: Restore DB from snapshot
+    local_action:
+      module: ec2_instance
+      key_name: 'autkp'
+      instance_type: t2.micro
+      image_id: ami-02a934b20c422dec5
+      secret_key: '{{ secret_key }}'
+      access_key: '{{ access_key }}'
+      region: us-east-1
+      wait: yes
+      wait_timeout: 1200
+      tags:
+          Name: Ansible_EC2
+    register: newinstance
+
+- name: Associate EIP with EC2 instance
+  local_action:
+    module: ec2_eip
+    instance_id: "{{ newinstance.instance_ids[0] }}"
+    region: us-east-1
+    in_vpc: true
+    reuse_existing_ip_allowed: true
+    state: present
+    public_ip: 52.71.27.185
+
