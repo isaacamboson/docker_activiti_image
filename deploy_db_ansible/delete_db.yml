@@ -22,6 +22,31 @@
 #     register: termination
 
 
+# - name: Terminate an EC2 instance
+#   hosts: localhost
+#   connection: local
+#   vars:
+#     instance_name: Ansible_MySQL-DB_EC2
+#   gather_facts: False
+#   tasks:
+#   - name: Gather EC2 instances information
+#     local_action:
+#       module: ec2_instance_info
+#       region: us-east-1
+#       filters:
+#         "tag:Name": "Ansible_MySQL*"
+#         instance-state-name: ["running"]
+#     register: ec2_node_info
+    
+#   - name: Terminate EC2 instance
+#     local_action:
+#       module: ec2_instance
+#       instance_ids: "{{ ec2_node_info.instances[0].instance_id }}"
+#       region: us-east-1 
+#       state: absent
+#     register: termination
+
+
 - name: Terminate an EC2 instance
   hosts: localhost
   connection: local
@@ -30,17 +55,16 @@
   gather_facts: False
   tasks:
   - name: Gather EC2 instances information
-    local_action:
-      module: ec2_instance_info
+    ec2_instance_info:
       region: us-east-1
       filters:
-        "tag:Name": "Ansible_MySQL*"
-        instance-state-name: ["running"]
+        # "tag:Name": "Ansible_MySQL*"
+        # instance-state-name: ["running"]
+        ip-address: 34.203.95.105
     register: ec2_node_info
     
   - name: Terminate EC2 instance
-    local_action:
-      module: ec2_instance
+    ec2_instance:
       instance_ids: "{{ ec2_node_info.instances[0].instance_id }}"
       region: us-east-1 
       state: absent
