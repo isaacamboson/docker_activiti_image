@@ -58,41 +58,41 @@ pipeline {
         //   }
         // }
 
-        stage ('Restore Activiti App MySQL Database and assign Elastic IP "34.203.95.105" to instance') {
-          steps {    
-            withCredentials([string(credentialsId: 'access_key', variable: 'access_key'),string(credentialsId: 'secret_access_key', variable: 'secret_access_key')]){        
-            sh '''
-            python3 -m venv python3-virtualenv
-            source python3-virtualenv/bin/activate
-            pip3 install boto3 botocore boto
-            ansible-playbook -i localhost $WORKSPACE/deploy_db_ansible/deploy_db.yml --extra-vars "access_key=${access_key} secret_key=${secret_access_key}"
-            deactivate
-            '''
-          }
-        }
-        }
+        // stage ('Restore Activiti App MySQL Database and assign Elastic IP "34.203.95.105" to instance') {
+        //   steps {    
+        //     withCredentials([string(credentialsId: 'access_key', variable: 'access_key'),string(credentialsId: 'secret_access_key', variable: 'secret_access_key')]){        
+        //     sh '''
+        //     python3 -m venv python3-virtualenv
+        //     source python3-virtualenv/bin/activate
+        //     pip3 install boto3 botocore boto
+        //     ansible-playbook -i localhost $WORKSPACE/deploy_db_ansible/deploy_db.yml --extra-vars "access_key=${access_key} secret_key=${secret_access_key}"
+        //     deactivate
+        //     '''
+        //   }
+        // }
+        // }
 
-        stage ('Deployment Destination') {
-        steps {
-            script {
-                def userInput = input(id: 'confirm', message: 'Verify that image operates properly', parameters: [ [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'Tear Down Environment?', name: 'confirm'] ])
-             }
-            //  withCredentials([string(credentialsId: 'DB_HOST', variable: 'DB_HOST_VAR')]){
-            //  sh '''
-            //   SERVER_INSTANCE=$DB_HOST_VAR
-            //   docker exec -d clixx-cont sed -i "s/'wordpressdbclixxjenkins.cd7numzl1xfe.us-east-1.rds.amazonaws.com'/'${SERVER_INSTANCE}'/g" /var/www/html/wp-config.php
-            //  '''
-            //  }
-          }
-        }
-
-        // stage ('Change wp-config check') {
+        // stage ('Deployment Destination') {
         // steps {
         //     script {
-        //         def userInput = input(id: 'confirm', message: 'wp-config was changed?', parameters: [ [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'Tear Down Environment?', name: 'confirm'] ])
-        //     }
+        //         def userInput = input(id: 'confirm', message: 'Verify that image operates properly', parameters: [ [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'Tear Down Environment?', name: 'confirm'] ])
+        //      }
+        //     //  withCredentials([string(credentialsId: 'DB_HOST', variable: 'DB_HOST_VAR')]){
+        //     //  sh '''
+        //     //   SERVER_INSTANCE=$DB_HOST_VAR
+        //     //   docker exec -d clixx-cont sed -i "s/'wordpressdbclixxjenkins.cd7numzl1xfe.us-east-1.rds.amazonaws.com'/'${SERVER_INSTANCE}'/g" /var/www/html/wp-config.php
+        //     //  '''
+        //     //  }
+        //   }
         // }
-        // }
+
+        // // stage ('Change wp-config check') {
+        // // steps {
+        // //     script {
+        // //         def userInput = input(id: 'confirm', message: 'wp-config was changed?', parameters: [ [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'Tear Down Environment?', name: 'confirm'] ])
+        // //     }
+        // // }
+        // // }
 
         stage ('Tear Down Activiti Docker Image and Database') {
           steps {
