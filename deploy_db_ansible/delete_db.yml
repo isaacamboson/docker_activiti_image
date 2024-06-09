@@ -48,11 +48,11 @@
 
 
 - name: Terminate an EC2 instance
-  hosts: localhost
+  hosts: launched
   connection: local
   vars:
     instance_name: Ansible_MySQL-DB_EC2
-  gather_facts: False
+  # gather_facts: False
   tasks:
   - name: Gather EC2 instances information
     local_action:
@@ -69,10 +69,11 @@
   - name: Terminate EC2 instance
     local_action:
       module: ec2_instance
+      region: us-east-1
       secret_key: '{{ secret_key }}'
       access_key: '{{ access_key }}'
       # instance_tags: '{"Name":"Ansible_MySQL-DB_EC2"}'
-      instance_ids: "{{ ec2_node_info.instance_ids[0] }}"
-      region: us-east-1 
+      instance_ids: "{{ ec2_node_info.instances[0].instance_id }}"
       state: absent
     register: termination
+
