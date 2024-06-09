@@ -32,49 +32,49 @@ pipeline {
         //     }
         // }
 
-        stage ('Build Docker Image') {
-          steps {
-            // script{
-            //  dockerHome= tool 'docker-inst'
-            // }
-            //  sh "${dockerHome}/bin/docker build . -t clixx-image:$VERSION "
-            sh '''
-            docker build . -t activiti-img:$VERSION
-            docker images
-            '''
-          }
-        }
-
-        stage ('Creating Docker Container Image') {
-          steps {
-              sh '''
-              if ( docker ps | grep activiti-cont ) then
-                 echo "Docker image exists, killing it"
-                 docker stop activiti-cont
-                 docker rm activiti-cont
-                 docker run --name activiti-cont -p 8081:8080 -d activiti-img:$VERSION
-                 docker ps
-              else
-                 docker run --name activiti-cont  -p 8081:8080 -d activiti-img:$VERSION 
-                 docker ps
-              fi
-              '''
-          }
-        }
-
-        // stage ('Restore CliXX Database') {
-        //   steps {    
-        //     withCredentials([string(credentialsId: 'access_key', variable: 'access_key'),string(credentialsId: 'secret_access_key', variable: 'secret_access_key')]){        
+        // stage ('Build Docker Image') {
+        //   steps {
+        //     // script{
+        //     //  dockerHome= tool 'docker-inst'
+        //     // }
+        //     //  sh "${dockerHome}/bin/docker build . -t clixx-image:$VERSION "
         //     sh '''
-        //     python3 -m venv python3-virtualenv
-        //     source python3-virtualenv/bin/activate
-        //     pip3 install boto3 botocore boto
-        //     ansible-playbook -i localhost $WORKSPACE/deploy_db_ansible/deploy_db.yml --extra-vars "access_key=${access_key} secret_key=${secret_access_key}"
-        //     deactivate
+        //     docker build . -t activiti-img:$VERSION
+        //     docker images
         //     '''
         //   }
         // }
+
+        // stage ('Creating Docker Container Image') {
+        //   steps {
+        //       sh '''
+        //       if ( docker ps | grep activiti-cont ) then
+        //          echo "Docker image exists, killing it"
+        //          docker stop activiti-cont
+        //          docker rm activiti-cont
+        //          docker run --name activiti-cont -p 8081:8080 -d activiti-img:$VERSION
+        //          docker ps
+        //       else
+        //          docker run --name activiti-cont  -p 8081:8080 -d activiti-img:$VERSION 
+        //          docker ps
+        //       fi
+        //       '''
+        //   }
         // }
+
+        stage ('Restore CliXX Database') {
+          steps {    
+            withCredentials([string(credentialsId: 'access_key', variable: 'access_key'),string(credentialsId: 'secret_access_key', variable: 'secret_access_key')]){        
+            sh '''
+            python3 -m venv python3-virtualenv
+            source python3-virtualenv/bin/activate
+            pip3 install boto3 botocore boto
+            ansible-playbook -i localhost $WORKSPACE/deploy_db_ansible/deploy_db.yml --extra-vars "access_key=${access_key} secret_key=${secret_access_key}"
+            deactivate
+            '''
+          }
+        }
+        }
 
         // stage ('Configure DB Instance') {
         //   steps {
