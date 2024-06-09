@@ -25,6 +25,8 @@
   - name: Associate EIP with MySQL - EC2 instance
     local_action:
       module: ec2_eip
+      secret_key: '{{ secret_key }}'
+      access_key: '{{ access_key }}'
       device_id: "{{ newinstance.instance_ids[0] }}"
       region: us-east-1
       in_vpc: true
