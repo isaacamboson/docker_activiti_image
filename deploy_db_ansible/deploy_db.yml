@@ -21,13 +21,13 @@
           Name: Ansible_MySQL-DB_EC2
     register: newinstance
 
-- name: "Associate EIP with MySQL - EC2 instance"
-  local_action:
-    module: ec2_eip
-    instance_id: "{{ newinstance.instance_ids[0] }}"
-    region: us-east-1
-    in_vpc: yes
-    reuse_existing_ip_allowed: yes
-    state: present
-    public_ip: 34.203.95.105
+  - name: Associate EIP with MySQL - EC2 instance
+    local_action:
+      module: ec2_eip
+      instance_id: "{{ newinstance.instance_ids[0] }}"
+      region: us-east-1
+      in_vpc: yes
+      reuse_existing_ip_allowed: yes
+      state: present
+      public_ip: 34.203.95.105
 
