@@ -61,9 +61,9 @@
       access_key: '{{ access_key }}'
       region: us-east-1
       filters:
-        # "tag:Name": "Ansible_MySQL*"
-        # instance-state-name: ["running"]
-        ip-address: 34.203.95.105
+        "tag:Name": "Ansible_MySQL*"
+        instance-state-name: ["running"]
+        # ip-address: 34.203.95.105
     register: ec2_node_info
     
   - name: Terminate EC2 instance
