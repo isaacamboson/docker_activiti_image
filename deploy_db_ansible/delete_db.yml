@@ -34,7 +34,7 @@
       module: ec2_instance_info
       region: us-east-1
       filters:
-        "tag:Name": "{{ instance_name }}"
+        "tag:Name": "Ansible_MySQL*"
         instance-state-name: ["running"]
     register: ec2_node_info
     
