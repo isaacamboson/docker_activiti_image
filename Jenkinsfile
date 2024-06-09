@@ -32,18 +32,19 @@ pipeline {
             }
         }
 
-        // stage ('Build Docker Image') {
-        //   steps {
-        //     // script{
-        //     //  dockerHome= tool 'docker-inst'
-        //     // }
-        //     //  sh "${dockerHome}/bin/docker build . -t clixx-image:$VERSION "
-        //     sh '''
-        //     docker build . -t clixx-image:$VERSION
-        //     docker images
-        //     '''
-        //   }
-        // }
+        stage ('Build Docker Image') {
+          steps {
+            // script{
+            //  dockerHome= tool 'docker-inst'
+            // }
+            //  sh "${dockerHome}/bin/docker build . -t clixx-image:$VERSION "
+            sh '''
+            #docker build . -t clixx-image:$VERSION
+            docker build -t 'activiti-img:$VERSION' .
+            docker images
+            '''
+          }
+        }
 
         // stage ('Creating Docker Container Image') {
         //   steps {
