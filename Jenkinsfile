@@ -62,7 +62,7 @@ pipeline {
         //   }
         // }
 
-        stage ('Restore CliXX Database') {
+        stage ('Restore Activiti App MySQL Database') {
           steps {    
             withCredentials([string(credentialsId: 'access_key', variable: 'access_key'),string(credentialsId: 'secret_access_key', variable: 'secret_access_key')]){        
             sh '''
