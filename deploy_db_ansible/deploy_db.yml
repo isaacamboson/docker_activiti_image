@@ -6,12 +6,13 @@
   vars:
     security_group: sg-029126963d349ab49
   tasks:
-  - name: Restore DB from snapshot
+  - name: Restore Activiti App MySQL-DB from EC2 AMI 
     local_action:
       module: ec2_instance
       key_name: 'mysql_db_kp'
       instance_type: t3.micro
       image_id: ami-04fa64dacd13c95a9
+      security_group: '{{ security_group }}'
       secret_key: '{{ secret_key }}'
       access_key: '{{ access_key }}'
       region: us-east-1
