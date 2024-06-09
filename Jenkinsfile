@@ -7,62 +7,62 @@ pipeline {
     }
  
     stages {
-        // stage ('Sonarcube Scan') {
-        // steps {
-        //     script {
-        //     scannerHome = tool 'sonarqube'
-        //     }
+        stage ('Sonarcube Scan') {
+        steps {
+            script {
+            scannerHome = tool 'sonarqube'
+            }
 
-        //     // use the withCredentials() Jenkins function to introduce the SONAR_TOKEN secret 
-        //     withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]){
-        //     withSonarQubeEnv('SonarQubeScanner') {
-        //     sh " ${scannerHome}/bin/sonar-scanner \
-        //     -Dsonar.projectKey=Activiti-app-Isaac  \
-        //     -Dsonar.login=${SONAR_TOKEN} "
-        //     }
-        //     }
-        // }
-        // }
+            // use the withCredentials() Jenkins function to introduce the SONAR_TOKEN secret 
+            withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]){
+            withSonarQubeEnv('SonarQubeScanner') {
+            sh " ${scannerHome}/bin/sonar-scanner \
+            -Dsonar.projectKey=Activiti-app-Isaac  \
+            -Dsonar.login=${SONAR_TOKEN} "
+            }
+            }
+        }
+        }
 
-        // stage('Quality Gate') {
-        //     steps {
-        //         timeout(time: 3, unit: 'MINUTES') {
-        //             waitForQualityGate abortPipeline: true
-        //         }   
-        //     }
-        // }
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 3, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }   
+            }
+        }
 
-        // stage ('Build Docker Image') {
-        //   steps {
-        //     // script{
-        //     //  dockerHome= tool 'docker-inst'
-        //     // }
-        //     //  sh "${dockerHome}/bin/docker build . -t clixx-image:$VERSION "
-        //     sh '''
-        //     docker build . -t activiti-img:$VERSION
-        //     docker images
-        //     '''
-        //   }
-        // }
+        stage ('Build Docker Image') {
+          steps {
+            // script{
+            //  dockerHome= tool 'docker-inst'
+            // }
+            //  sh "${dockerHome}/bin/docker build . -t clixx-image:$VERSION "
+            sh '''
+            docker build . -t activiti-img:$VERSION
+            docker images
+            '''
+          }
+        }
 
-        // stage ('Creating Docker Container Image') {
-        //   steps {
-        //       sh '''
-        //       if ( docker ps | grep activiti-cont ) then
-        //          echo "Docker image exists, killing it"
-        //          docker stop activiti-cont
-        //          docker rm activiti-cont
-        //          docker run --name activiti-cont -p 8081:8080 -d activiti-img:$VERSION
-        //          docker ps
-        //       else
-        //          docker run --name activiti-cont  -p 8081:8080 -d activiti-img:$VERSION 
-        //          docker ps
-        //       fi
-        //       '''
-        //   }
-        // }
+        stage ('Creating Docker Container') {
+          steps {
+              sh '''
+              if ( docker ps | grep activiti-cont ) then
+                 echo "Docker image exists, killing it"
+                 docker stop activiti-cont
+                 docker rm activiti-cont
+                 docker run --name activiti-cont -p 8081:8080 -d activiti-img:$VERSION
+                 docker ps
+              else
+                 docker run --name activiti-cont  -p 8081:8080 -d activiti-img:$VERSION 
+                 docker ps
+              fi
+              '''
+          }
+        }
 
-        stage ('Restore Activiti App MySQL Database') {
+        stage ('Restore Activiti App MySQL Database and assign Elastic IP "34.203.95.105" to instance') {
           steps {    
             withCredentials([string(credentialsId: 'access_key', variable: 'access_key'),string(credentialsId: 'secret_access_key', variable: 'secret_access_key')]){        
             sh '''
@@ -76,50 +76,19 @@ pipeline {
         }
         }
 
-        // stage ('Configure DB Instance') {
-        //   steps {
-        //     withCredentials([string(credentialsId: 'DB_USER', variable: 'DB_USER_VAR'), string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD_VAR'), string(credentialsId: 'DB_NAME', variable: 'DB_NAME_VAR'), string(credentialsId: 'DB_HOST', variable: 'DB_HOST_VAR')]){
-        //     script {
-        //     def userInput = input(id: 'confirm', message: 'Is DB creation complete?', parameters: [ [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'Complete?', name: 'confirm'] ])
-        //      }
-        //       sh '''
-        //        USERNAME=$DB_USER_VAR
-        //        PASSWORD=$DB_PASSWORD_VAR
-        //        DBNAME=$DB_NAME_VAR
-        //        SERVER_INSTANCE=$DB_HOST_VAR              
-
-        //        TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"` \
-        //        SERVER_IP=`curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/public-ipv4`   
-               
-        //        #OR
-        //        #SERVER_IP=$(curl -s http://checkip.dyndns.org | sed -e 's/.*Current IP Address: //' -e 's/<.*$//')            
-               
-        //        echo "use wordpressdb;" > $WORKSPACE/db.setup
-        //        echo "UPDATE wp_options SET option_value = '$SERVER_IP' WHERE option_id = '1';" >> $WORKSPACE/db.setup
-        //        echo "UPDATE wp_options SET option_value = '$SERVER_IP' WHERE option_id = '2';" >> $WORKSPACE/db.setup
-
-        //        mysql -u $USERNAME --password=$PASSWORD -h $SERVER_INSTANCE -D $DBNAME < $WORKSPACE/db.setup
-               
-        //        #docker exec -d clixx-cont sed -i "s/'wordpressdbclixxjenkins.cd7numzl1xfe.us-east-1.rds.amazonaws.com'/'${SERVER_INSTANCE}'/g" /var/www/html/wp-config.php
-               
-        //       '''
-        //   }
-        // }
-        // }
-
-        // stage ('Deployment Destination') {
-        // steps {
-        //     script {
-        //         def userInput = input(id: 'confirm', message: 'Image operates properly?', parameters: [ [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'Tear Down Environment?', name: 'confirm'] ])
-        //      }
-        //      withCredentials([string(credentialsId: 'DB_HOST', variable: 'DB_HOST_VAR')]){
-        //      sh '''
-        //       SERVER_INSTANCE=$DB_HOST_VAR
-        //       docker exec -d clixx-cont sed -i "s/'wordpressdbclixxjenkins.cd7numzl1xfe.us-east-1.rds.amazonaws.com'/'${SERVER_INSTANCE}'/g" /var/www/html/wp-config.php
-        //      '''
-        //      }
-        //   }
-        // }
+        stage ('Deployment Destination') {
+        steps {
+            script {
+                def userInput = input(id: 'confirm', message: 'Verify that image operates properly', parameters: [ [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'Tear Down Environment?', name: 'confirm'] ])
+             }
+            //  withCredentials([string(credentialsId: 'DB_HOST', variable: 'DB_HOST_VAR')]){
+            //  sh '''
+            //   SERVER_INSTANCE=$DB_HOST_VAR
+            //   docker exec -d clixx-cont sed -i "s/'wordpressdbclixxjenkins.cd7numzl1xfe.us-east-1.rds.amazonaws.com'/'${SERVER_INSTANCE}'/g" /var/www/html/wp-config.php
+            //  '''
+            //  }
+          }
+        }
 
         // stage ('Change wp-config check') {
         // steps {
