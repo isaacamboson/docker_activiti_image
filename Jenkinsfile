@@ -58,19 +58,19 @@ pipeline {
         //   }
         // }
 
-        stage ('Restore Activiti App MySQL Database and assign Elastic IP "34.203.95.105" to instance') {
-          steps {    
-            withCredentials([string(credentialsId: 'access_key', variable: 'access_key'),string(credentialsId: 'secret_access_key', variable: 'secret_access_key')]){        
-            sh '''
-            python3 -m venv python3-virtualenv
-            source python3-virtualenv/bin/activate
-            pip3 install boto3 botocore boto
-            ansible-playbook -i localhost $WORKSPACE/deploy_db_ansible/deploy_db.yml --extra-vars "access_key=${access_key} secret_key=${secret_access_key}"
-            deactivate
-            '''
-          }
-        }
-        }
+        // stage ('Restore Activiti App MySQL Database and assign Elastic IP "34.203.95.105" to instance') {
+        //   steps {    
+        //     withCredentials([string(credentialsId: 'access_key', variable: 'access_key'),string(credentialsId: 'secret_access_key', variable: 'secret_access_key')]){        
+        //     sh '''
+        //     python3 -m venv python3-virtualenv
+        //     source python3-virtualenv/bin/activate
+        //     pip3 install boto3 botocore boto
+        //     ansible-playbook -i localhost $WORKSPACE/deploy_db_ansible/deploy_db.yml --extra-vars "access_key=${access_key} secret_key=${secret_access_key}"
+        //     deactivate
+        //     '''
+        //   }
+        // }
+        // }
 
         // stage ('Deployment Destination') {
         // steps {
