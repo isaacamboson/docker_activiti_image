@@ -39,8 +39,7 @@ pipeline {
             // }
             //  sh "${dockerHome}/bin/docker build . -t clixx-image:$VERSION "
             sh '''
-            #docker build . -t clixx-image:$VERSION
-            docker build -t 'activiti-img:$VERSION' .
+            docker build . -t activiti-img:$VERSION
             docker images
             '''
           }
