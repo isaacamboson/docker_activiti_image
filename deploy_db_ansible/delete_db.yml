@@ -3,15 +3,15 @@
   hosts: localhost
   connection: local
   vars:
-    instance_name: Ansible_EC2
+    instance_name: Ansible_MySQL-DB_EC2
   gather_facts: False
   tasks:
   - name: Gather EC2 instances information
     ec2_instance_info:
-    region: us-east-1
-    filters:
-      "tag:Name": "{{ instance_name }}"
-      instance-state-name: "running"
+      region: us-east-1
+      filters:
+        "tag:Name": "{{ instance_name }}"
+        instance-state-name: "running"
     register: ec2_info
     
   - name: Terminate EC2 instance
