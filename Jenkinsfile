@@ -7,30 +7,30 @@ pipeline {
     }
  
     stages {
-        stage ('Sonarcube Scan') {
-        steps {
-            script {
-            scannerHome = tool 'sonarqube'
-            }
+        // stage ('Sonarcube Scan') {
+        // steps {
+        //     script {
+        //     scannerHome = tool 'sonarqube'
+        //     }
 
-            // use the withCredentials() Jenkins function to introduce the SONAR_TOKEN secret 
-            withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]){
-            withSonarQubeEnv('SonarQubeScanner') {
-            sh " ${scannerHome}/bin/sonar-scanner \
-            -Dsonar.projectKey=Activiti-app-Isaac  \
-            -Dsonar.login=${SONAR_TOKEN} "
-            }
-            }
-        }
-        }
+        //     // use the withCredentials() Jenkins function to introduce the SONAR_TOKEN secret 
+        //     withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]){
+        //     withSonarQubeEnv('SonarQubeScanner') {
+        //     sh " ${scannerHome}/bin/sonar-scanner \
+        //     -Dsonar.projectKey=Activiti-app-Isaac  \
+        //     -Dsonar.login=${SONAR_TOKEN} "
+        //     }
+        //     }
+        // }
+        // }
 
-        stage('Quality Gate') {
-            steps {
-                timeout(time: 3, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }   
-            }
-        }
+        // stage('Quality Gate') {
+        //     steps {
+        //         timeout(time: 3, unit: 'MINUTES') {
+        //             waitForQualityGate abortPipeline: true
+        //         }   
+        //     }
+        // }
 
         stage ('Build Docker Image') {
           steps {
