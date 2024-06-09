@@ -21,7 +21,7 @@
           Name: Ansible_MySQL-DB_EC2
     register: newinstance
 
-- name: Associate EIP with MySQL - EC2 instance
+- name: "Associate EIP with MySQL - EC2 instance"
   local_action:
     module: ec2_eip
     instance_id: "{{ newinstance.instance_ids[0] }}"
