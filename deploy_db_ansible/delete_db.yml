@@ -32,8 +32,6 @@
   - name: Gather EC2 instances information
     local_action:
       module: ec2_instance_info
-      secret_key: '{{ secret_key }}'
-      access_key: '{{ access_key }}'
       region: us-east-1
       filters:
         "tag:Name": "{{ instance_name }}"
