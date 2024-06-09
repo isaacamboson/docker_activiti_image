@@ -45,22 +45,22 @@ pipeline {
           }
         }
 
-        // stage ('Creating Docker Container Image') {
-        //   steps {
-        //       sh '''
-        //       if ( docker ps | grep clixx-cont ) then
-        //          echo "Docker image exists, killing it"
-        //          docker stop clixx-cont
-        //          docker rm clixx-cont
-        //          docker run --name clixx-cont -p 80:80 -d clixx-image:$VERSION
-        //          docker ps
-        //       else
-        //          docker run --name clixx-cont  -p 80:80 -d clixx-image:$VERSION 
-        //          docker ps
-        //       fi
-        //       '''
-        //   }
-        // }
+        stage ('Creating Docker Container Image') {
+          steps {
+              sh '''
+              if ( docker ps | grep activiti-cont ) then
+                 echo "Docker image exists, killing it"
+                 docker stop activiti-cont
+                 docker rm activiti-cont
+                 docker run --name activiti-cont -p 8081:8080 -d activiti-img:$VERSION
+                 docker ps
+              else
+                 docker run --name activiti-cont  -p 8081:8080 -d activiti-img:$VERSION 
+                 docker ps
+              fi
+              '''
+          }
+        }
 
         // stage ('Restore CliXX Database') {
         //   steps {    
