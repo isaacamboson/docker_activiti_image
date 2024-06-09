@@ -39,6 +39,8 @@ pipeline {
             // }
             //  sh "${dockerHome}/bin/docker build . -t clixx-image:$VERSION "
             sh '''
+            systemctl start docker 
+            systemctl status docker
             docker build . -t activiti-img:$VERSION
             docker images
             '''
