@@ -7,56 +7,56 @@ pipeline {
     }
  
     stages {
-        // stage ('Sonarcube Scan') {
-        // steps {
-        //     script {
-        //     scannerHome = tool 'sonarqube'
-        //     }
+        stage ('Sonarcube Scan') {
+        steps {
+            script {
+            scannerHome = tool 'sonarqube'
+            }
 
-        //     // use the withCredentials() Jenkins function to introduce the SONAR_TOKEN secret 
-        //     withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]){
-        //     withSonarQubeEnv('SonarQubeScanner') {
-        //     sh " ${scannerHome}/bin/sonar-scanner \
-        //     -Dsonar.projectKey=Activiti-app-Isaac  \
-        //     -Dsonar.login=${SONAR_TOKEN} "
-        //     }
-        //     }
-        // }
-        // }
+            // use the withCredentials() Jenkins function to introduce the SONAR_TOKEN secret 
+            withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]){
+            withSonarQubeEnv('SonarQubeScanner') {
+            sh " ${scannerHome}/bin/sonar-scanner \
+            -Dsonar.projectKey=Activiti-app-Isaac  \
+            -Dsonar.login=${SONAR_TOKEN} "
+            }
+            }
+        }
+        }
 
-        // stage('Quality Gate') {
-        //     steps {
-        //         timeout(time: 3, unit: 'MINUTES') {
-        //             waitForQualityGate abortPipeline: true
-        //         }   
-        //     }
-        // }
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 3, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }   
+            }
+        }
 
-        // stage ('Build Docker Image') {
-        //   steps {
-        //     sh '''
-        //     docker build . -t activiti-img:$VERSION
-        //     docker images
-        //     '''
-        //   }
-        // }
+        stage ('Build Docker Image') {
+          steps {
+            sh '''
+            docker build . -t activiti-img:$VERSION
+            docker images
+            '''
+          }
+        }
 
-        // stage ('Creating Docker Container') {
-        //   steps {
-        //       sh '''
-        //       if ( docker ps | grep activiti-cont ) then
-        //          echo "Docker image exists, killing it"
-        //          docker stop activiti-cont
-        //          docker rm activiti-cont
-        //          docker run --name activiti-cont -p 8081:8080 -d activiti-img:$VERSION
-        //          docker ps
-        //       else
-        //          docker run --name activiti-cont  -p 8081:8080 -d activiti-img:$VERSION 
-        //          docker ps
-        //       fi
-        //       '''
-        //   }
-        // }
+        stage ('Creating Docker Container') {
+          steps {
+              sh '''
+              if ( docker ps | grep activiti-cont ) then
+                 echo "Docker image exists, killing it"
+                 docker stop activiti-cont
+                 docker rm activiti-cont
+                 docker run --name activiti-cont -p 8081:8080 -d activiti-img:$VERSION
+                 docker ps
+              else
+                 docker run --name activiti-cont  -p 8081:8080 -d activiti-img:$VERSION 
+                 docker ps
+              fi
+              '''
+          }
+        }
 
         stage ('Restore Activiti App MySQL Database and assign Elastic IP "34.203.95.105" to instance') {
           steps {    
@@ -72,29 +72,15 @@ pipeline {
         }
         }
 
-        // stage ('Deployment Destination') {
-        // steps {
-        //     script {
-        //         def userInput = input(id: 'confirm', message: 'Verify that image operates properly', parameters: [ [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'Tear Down Environment?', name: 'confirm'] ])
-        //      }
-        //     //  withCredentials([string(credentialsId: 'DB_HOST', variable: 'DB_HOST_VAR')]){
-        //     //  sh '''
-        //     //   SERVER_INSTANCE=$DB_HOST_VAR
-        //     //   docker exec -d clixx-cont sed -i "s/'wordpressdbclixxjenkins.cd7numzl1xfe.us-east-1.rds.amazonaws.com'/'${SERVER_INSTANCE}'/g" /var/www/html/wp-config.php
-        //     //  '''
-        //     //  }
-        //   }
-        // }
+        stage ('Deployment Destination') {
+        steps {
+            script {
+                def userInput = input(id: 'confirm', message: 'Verify that image operates properly', parameters: [ [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'Tear Down Environment?', name: 'confirm'] ])
+             }
+          }
+        }
 
-        // // stage ('Change wp-config check') {
-        // // steps {
-        // //     script {
-        // //         def userInput = input(id: 'confirm', message: 'wp-config was changed?', parameters: [ [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'Tear Down Environment?', name: 'confirm'] ])
-        // //     }
-        // // }
-        // // }
-
-        stage ('Tear Down Activiti Docker Image and Database') {
+        stage ('Tear Down Activiti Docker Container and Database') {
           steps {
             script {
                def userInput = input(id: 'confirm', message: 'Tear Down Environment?', parameters: [ [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'Tear Down Environment?', name: 'confirm'] ])
@@ -114,24 +100,24 @@ pipeline {
           }
         }
 
-        // stage ('Log Into ECR and Push the Newly Created Docker Image') {
-        //   steps {
-        //      script {
-        //         def userInput = input(id: 'confirm', message: 'Push Image To ECR?', parameters: [ [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'Push to ECR?', name: 'confirm'] ])
-        //      }
-        //      withCredentials([string(credentialsId: 'ECR_USERNAME', variable: 'ECR_USERNAME_VAR'), string(credentialsId: 'ECR_REPO_ACTIVITI', variable: 'ECR_REPO_VAR'), ]){
-        //       sh '''
-        //         aws ecr get-login-password --region us-east-1 | docker login --username ${ECR_USERNAME_VAR} --password-stdin ${ECR_REPO_VAR}
-        //         docker tag activiti-img:$VERSION ${ECR_REPO_VAR}:activiti-cont-$VERSION
-        //         docker tag activiti-img:$VERSION ${ECR_REPO_VAR}:latest
+        stage ('Log Into ECR and Push the Newly Created Docker Image') {
+          steps {
+             script {
+                def userInput = input(id: 'confirm', message: 'Push Image To ECR?', parameters: [ [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'Push to ECR?', name: 'confirm'] ])
+             }
+             withCredentials([string(credentialsId: 'ECR_USERNAME', variable: 'ECR_USERNAME_VAR'), string(credentialsId: 'ECR_REPO_ACTIVITI', variable: 'ECR_REPO_VAR'), ]){
+              sh '''
+                aws ecr get-login-password --region us-east-1 | docker login --username ${ECR_USERNAME_VAR} --password-stdin ${ECR_REPO_VAR}
+                docker tag activiti-img:$VERSION ${ECR_REPO_VAR}:activiti-cont-$VERSION
+                docker tag activiti-img:$VERSION ${ECR_REPO_VAR}:latest
 
-        //         docker push ${ECR_REPO_VAR}:activiti-cont-$VERSION
-        //         docker push ${ECR_REPO_VAR}:latest
+                docker push ${ECR_REPO_VAR}:activiti-cont-$VERSION
+                docker push ${ECR_REPO_VAR}:latest
 
-        //         '''
-        //      }
-        //   }
-        // }
+                '''
+             }
+          }
+        }
 
     }
 }
@@ -147,7 +133,3 @@ def getDockerPath(){
         return DockerHome
     }
 
-// def getAnsiblePath(){
-//         def AnsibleHome= tool name: 'ansible-pb', type: 'ansiblePlaybook installation: 'ansible-pb', playbook: '', vaultTmpPath: '''
-//         return AnsibleHome
-//     }
