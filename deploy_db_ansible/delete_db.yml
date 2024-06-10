@@ -48,32 +48,32 @@
 
 
 - name: Terminate an EC2 instance
-  hosts: launched
+  hosts: localhost
   connection: local
   vars:
     instance_name: Ansible_MySQL-DB_EC2
   # gather_facts: False
   tasks:
   - name: Gather EC2 instances information
-    local_action:
-      module: ec2_instance_info
-      secret_key: '{{ secret_key }}'
-      access_key: '{{ access_key }}'
+    ec2_instance_info:
       region: us-east-1
       filters:
-        "tag:Name": "Ansible_MySQL*"
-        instance-state-name: ["running"]
-        # ip-address: 34.203.95.105
+        # "tag:Name": "Ansible_MySQL*"
+        # instance-state-name: ["running"]
+        ip-address: 34.203.95.105
+      secret_key: '{{ secret_key }}'
+      access_key: '{{ access_key }}'        
     register: ec2_node_info
     
   - name: Terminate EC2 instance
-    local_action:
-      module: ec2_instance
+    ec2:
+      instance_ids: "{{ ec2_node_info.instances[0].instance_id }}"
+      state: absent
       region: us-east-1
       secret_key: '{{ secret_key }}'
       access_key: '{{ access_key }}'
       # instance_tags: '{"Name":"Ansible_MySQL-DB_EC2"}'
-      instance_ids: "{{ ec2_node_info.instances[0].instance_id }}"
-      state: absent
+      
+      
     register: termination
 
