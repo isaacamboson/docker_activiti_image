@@ -108,17 +108,16 @@ pipeline {
              withCredentials([string(credentialsId: 'ECR_USERNAME', variable: 'ECR_USERNAME_VAR'), string(credentialsId: 'ECR_REPO_ACTIVITI', variable: 'ECR_REPO_VAR'), ]){
               sh '''
                 aws ecr get-login-password --region us-east-1 | docker login --username ${ECR_USERNAME_VAR} --password-stdin ${ECR_REPO_VAR}
-                docker tag activiti-img:$VERSION ${ECR_REPO_VAR}:activiti-cont-$VERSION
+                docker tag activiti-img:$VERSION ${ECR_REPO_VAR}:activiti-img-$VERSION
                 docker tag activiti-img:$VERSION ${ECR_REPO_VAR}:latest
 
-                docker push ${ECR_REPO_VAR}:activiti-cont-$VERSION
+                docker push ${ECR_REPO_VAR}:activiti-img-$VERSION
                 docker push ${ECR_REPO_VAR}:latest
 
                 '''
              }
           }
         }
-
     }
 }
 
